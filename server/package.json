@@ -1,0 +1,19 @@
+{
+  "name": "tender-finder-server",
+  "type": "commonjs",
+  "scripts": {
+    "seed": "node seed.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4",
+    "cors": "^2",
+    "dotenv": "^16",
+    "csv-parse": "^5",
+    "better-sqlite3": "^9"
+  },
+  "devDependencies": {
+    "nodemon": "^3"
+  }
+}
