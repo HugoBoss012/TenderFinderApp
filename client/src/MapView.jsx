@@ -26,7 +26,9 @@ export default function MapView({ user, items, selectedId, onSelect }) {
       <Marker position={center}>
         <Popup>Default location<br/>Lat: {user.lat.toFixed(3)} Lon: {user.lon.toFixed(3)}<br/>Radius: {user.radiusKm} km</Popup>
       </Marker>
-      {items.map(item => (
+      {items.filter(item =>
+        Number.isFinite(item.tender_latitude) && Number.isFinite(item.tender_longitude)
+      ).map(item => (
         <Marker key={item.id} position={[item.tender_latitude, item.tender_longitude]}
           eventHandlers={{ click: ()=> onSelect(item.id) }}>
           <Popup>

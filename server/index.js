@@ -31,20 +31,13 @@ function parseDateISO(v) {
   return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0,10);
 }
 
-// Simple relevancy score (0..100)
-function score({ distanceKm, deadlineISO, nProps, expensive, mid, social }) {
-  // nearer (<= 5km => 1, 50km => ~0), more props, sooner deadline
-  const prox = Math.max(0, 1 - (distanceKm || 50) / 50);
-  let urg = 0.5; // neutral if unknown
-  if (deadlineISO) {
-    const days = (new Date(deadlineISO) - new Date()) / (1000*60*60*24);
-    // 0 days => 1.0, 90 days => 0
-    urg = Math.max(0, Math.min(1, 1 - days / 90));
-  }
-  const props = Math.min(1, (nProps || 0) / 100); // cap at 100
-  // Weight expensive > mid > social as a proxy for value if present
-  const valueProxy = Math.max(0, (expensive ?? 0)*0.6 + (mid ?? 0)*0.3 + (social ?? 0)*0.1);
-  const raw = 0.45*prox + 0.25*urg + 0.2*props + 0.1*valueProxy;
+// Simple relevancy ranking (0..100)
+function ranking({ distanceKm, deadlineISO, nProps, expensive, mid, social }) {
+  // Simple ranking: closer, sooner, more properties
+  const prox = 1 - Math.min(1, (distanceKm || 50) / 50);
+  const urg = deadlineISO ? Math.max(0, 1 - ((new Date(deadlineISO) - new Date()) / (1000*60*60*24*90))) : 0.5;
+  const props = Math.min(1, (nProps || 0) / 100);
+  const raw = (prox + urg + props) / 3;
   return Math.round(raw * 100);
 }
 
@@ -61,7 +54,7 @@ app.get('/api/tenders', (req, res) => {
     const lon = r.tender_longitude;
     const dist = (Number.isFinite(lat) && Number.isFinite(lon)) ? haversine(userLat, userLon, lat, lon) : null;
     const deadlineISO = parseDateISO(r.tender_deadline);
-    const sc = score({
+    const sc = ranking({
       distanceKm: dist,
       deadlineISO,
       nProps: r.number_of_properties,
@@ -88,6 +81,37 @@ app.get('/api/tenders/:id', (req,res) => {
   const row = db.prepare('SELECT * FROM tenders WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'Not found' });
   res.json(row);
+});
+
+
+// Stats endpoint: returns summary statistics about tenders
+app.get('/api/stats', (req, res) => {
+  const rows = db.prepare('SELECT * FROM tenders').all();
+  const total = rows.length;
+  const byStatus = {};
+  const byMunicipality = {};
+  let minDeadline = null, maxDeadline = null;
+  rows.forEach(r => {
+    // Status count
+    const status = r.status || 'Unknown';
+    byStatus[status] = (byStatus[status] || 0) + 1;
+    // Municipality count
+    const mun = r.municipality || 'Unknown';
+    byMunicipality[mun] = (byMunicipality[mun] || 0) + 1;
+    // Deadlines
+    if (r.tender_deadline) {
+      const d = new Date(r.tender_deadline);
+      if (!minDeadline || d < minDeadline) minDeadline = d;
+      if (!maxDeadline || d > maxDeadline) maxDeadline = d;
+    }
+  });
+  res.json({
+    total,
+    byStatus,
+    byMunicipality,
+    minDeadline: minDeadline ? minDeadline.toISOString().slice(0,10) : null,
+    maxDeadline: maxDeadline ? maxDeadline.toISOString().slice(0,10) : null
+  });
 });
 
 app.listen(PORT, () => console.log(`API on :${PORT}`));

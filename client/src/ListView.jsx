@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import './ListView.css';
+
 
 export default function ListView({ items, selectedId, onSelect }) {
   const refs = useRef({});
@@ -9,8 +11,8 @@ export default function ListView({ items, selectedId, onSelect }) {
   }, [selectedId]);
 
   return (
-    <div style={{ height: 'calc(100vh - 100px)', overflow: 'auto', fontSize: 14 }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <div className="listview-container">
+      <table className="listview-table">
         <thead>
           <tr>
             <th align="left">Relevancy</th>
@@ -25,10 +27,12 @@ export default function ListView({ items, selectedId, onSelect }) {
         </thead>
         <tbody>
           {items.map(item => (
-            <tr key={item.id}
-                ref={el => refs.current[item.id] = el}
-                onClick={() => onSelect(item.id)}
-                style={{ cursor:'pointer', background: selectedId===item.id ? '#f0f7ff' : 'transparent' }}>
+            <tr
+              key={item.id}
+              ref={el => refs.current[item.id] = el}
+              onClick={() => onSelect(item.id)}
+              className={selectedId === item.id ? 'selected' : ''}
+            >
               <td>{item.relevancy}</td>
               <td>{item.location || '—'}</td>
               <td>{item.municipality || '—'}</td>

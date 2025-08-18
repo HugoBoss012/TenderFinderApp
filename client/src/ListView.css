@@ -1,0 +1,44 @@
+.listview-container {
+  height: calc(100vh - 100px);
+  overflow: auto;
+  font-size: 15px;
+  background: #f9fbfd;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  border: 1px solid #dbeafe;
+  margin: 1.5rem auto;
+  max-width: 96vw;
+  transition: box-shadow 0.2s;
+  padding: 1rem;
+}
+.listview-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.listview-table th {
+  background: #e0e7ff;
+  color: #222;
+  font-weight: 700;
+  padding: 0.8em 0.6em;
+  border-bottom: 2px solid #c7d2fe;
+  font-size: 1.05em;
+  letter-spacing: 0.01em;
+}
+.listview-table td {
+  padding: 0.7em 0.6em;
+  border-bottom: 1px solid #e5e7eb;
+  color: #333;
+  background: #fff;
+}
+.listview-table tr {
+  transition: background 0.18s, box-shadow 0.18s;
+  cursor: pointer;
+}
+.listview-table tr.selected {
+  background: #dbeafe;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+}
+.listview-table tr:hover {
+  background: #e0e7ff;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.10);
+}
