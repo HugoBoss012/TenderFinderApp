@@ -30,15 +30,17 @@
   color: #333;
   background: #fff;
 }
-.listview-table tr {
+.listview-table tr th{
   transition: background 0.18s, box-shadow 0.18s;
   cursor: pointer;
+  text-align: left;
 }
 .listview-table tr.selected td {
-  background: red;
+  background: #9CD3D9;
   box-shadow: 0 2px 8px rgba(59,130,246,0.08);
 }
 .listview-table tr:hover {
   background: #e0e7ff;
   box-shadow: 0 2px 8px rgba(59,130,246,0.10);
 }
+

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { fetchTenders } from "./api";
 import MapView from "./MapView";
 import ListView from "./ListView";
+import "../styling/App.css";
 
 export default function App() {
   const [data, setData] = useState({
@@ -47,10 +48,9 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: "100vh" }}>
-      <div style={{ padding: 8, borderRight: "1px solid #eee", display: "flex", flexDirection: "column" }}>
-
-        <div style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
+    <div className="app-grid">
+      <div className="app-list-panel">
+        <div className="app-search-row">
           <input placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
           <label>
             Radius (km)
@@ -67,21 +67,21 @@ export default function App() {
                   setRadiusKm(number)
                 }
               }}
-              style={{ width: 80, marginLeft: 6 }}
+              className="app-radius-input"
             />
           </label>
-          {q && <button onClick={() => setQ("")}>Clear</button>}
-          <span style={{ marginLeft: "auto", fontSize: 12, opacity: 0.7 }}>
+          {q && <button className="app-clear-btn" onClick={() => setQ("")}>Clear</button>}
+          <span className="app-results-count">
             {loading ? "Loading…" : `${data.count} results`}
           </span>
         </div>
 
-        <div style={{ flex: 1, overflow: "hidden" }}>
+        <div className="app-list-content">
           {
             loading
               ? 'Loading...'
               : data.items.length === 0
-                ? <div style={{ padding: 12, opacity: 0.7 }}>No tenders match your filters.</div>
+                ? <div className="app-no-results">No tenders match your filters.</div>
                 : <ListView items={data.items} selectedId={selectedId} onSelect={handleSelect} markerRefs={markerRefs} />
           }
         </div>

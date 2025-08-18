@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import './ListView.css';
+import '../styling/ListView.css';
 
 
 export default function ListView({ items, selectedId, onSelect }) {
@@ -15,14 +15,14 @@ export default function ListView({ items, selectedId, onSelect }) {
       <table className="listview-table">
         <thead>
           <tr>
-            <th align="left">Relevancy</th>
-            <th align="left">Location</th>
-            <th align="left">Municipality</th>
-            <th align="left">Deadline</th>
-            <th align="left">Published</th>
-            <th align="left">Status</th>
-            <th align="left">#Props</th>
-            <th align="left">Distance (km)</th>
+            <th>Relevancy</th>
+            <th>Location</th>
+            <th>Municipality</th>
+            <th>Deadline</th>
+            <th>Published</th>
+            <th>Status</th>
+            <th>#Props</th>
+            <th>Distance (km)</th>
           </tr>
         </thead>
         <tbody>
