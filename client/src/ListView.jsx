@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import './ListView.css';
 
 
@@ -29,8 +29,10 @@ export default function ListView({ items, selectedId, onSelect }) {
           {items.map(item => (
             <tr
               key={item.id}
-              ref={el => refs.current[item.id] = el}
-              onClick={() => onSelect(item.id)}
+              ref={el => { refs.current[item.id] = el }}
+              onClick={() => {
+                onSelect(item.id)
+              }}
               className={selectedId === item.id ? 'selected' : ''}
             >
               <td>{item.relevancy}</td>

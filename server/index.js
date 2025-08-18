@@ -44,15 +44,24 @@ function ranking({ distanceKm, deadlineISO, nProps, expensive, mid, social }) {
 app.get('/api/tenders', (req, res) => {
   const userLat = parseNum(req.query.lat, 52.370216);   // default Amsterdam
   const userLon = parseNum(req.query.lon, 4.895168);
-  const radiusKm = parseNum(req.query.radiusKm, 50);
+  const radiusKm = parseNum(req.query.radiusKm);
   const q = String(req.query.q || '').trim().toLowerCase();
 
   const rows = db.prepare('SELECT * FROM tenders').all();
 
   const enriched = rows.map(r => {
-    const lat = r.tender_latitude;
-    const lon = r.tender_longitude;
-    const dist = (Number.isFinite(lat) && Number.isFinite(lon)) ? haversine(userLat, userLon, lat, lon) : null;
+    const lat = Number.isFinite(r.tender_latitude) ? r.tender_latitude : r.center_municipality_latitude
+    if (!Number.isFinite(lat)) {
+      throw new Error('Could not find valid latitude')
+    }
+    const lon = Number.isFinite(r.tender_longitude) ? r.tender_longitude : r.center_municipality_longitude
+    if (!Number.isFinite(lon)) {
+      throw new Error('Could not find valid longitude')
+    }
+    const dist = haversine(userLat, userLon, lat, lon);
+    if (!dist) {
+      throw new Error('Could calculate distance')
+    }
     const deadlineISO = parseDateISO(r.tender_deadline);
     const sc = ranking({
       distanceKm: dist,
@@ -64,7 +73,7 @@ app.get('/api/tenders', (req, res) => {
     });
     return { ...r, distance_km: dist, deadline_iso: deadlineISO, relevancy: sc };
   })
-  .filter(r => r.distance_km == null || r.distance_km <= radiusKm)
+  .filter(r => radiusKm == null || r.distance_km <= radiusKm)
   .filter(r => !q || (
     (r.municipality || '').toLowerCase().includes(q) ||
     (r.location || '').toLowerCase().includes(q) ||

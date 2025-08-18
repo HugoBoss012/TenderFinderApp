@@ -34,8 +34,8 @@
   transition: background 0.18s, box-shadow 0.18s;
   cursor: pointer;
 }
-.listview-table tr.selected {
-  background: #dbeafe;
+.listview-table tr.selected td {
+  background: red;
   box-shadow: 0 2px 8px rgba(59,130,246,0.08);
 }
 .listview-table tr:hover {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { fetchTenders } from "./api";
 import MapView from "./MapView";
 import ListView from "./ListView";
@@ -13,8 +13,9 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [q, setQ] = useState("");
   const [radiusKm, setRadiusKm] = useState(50);
+  const markerRefs = useRef({})
 
-  const loader = async () => {
+  const loader = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetchTenders({
@@ -29,20 +30,20 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [radiusKm, q])
 
   useEffect(() => {
     loader();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    loader();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, radiusKm]);
+  }, [loader]);
 
   if (!data.user || !data.user.lat || !data.user.lon) {
     return <div>No location data available</div>;
+  }
+
+  function handleSelect (itemId) {
+    setSelectedId(itemId)
+    const marker = markerRefs.current[itemId]
+    marker.openPopup()
   }
 
   return (
@@ -58,7 +59,14 @@ export default function App() {
               min={1}
               max={200}
               value={radiusKm}
-              onChange={(e) => setRadiusKm(Number(e.target.value) || 50)}
+              onChange={(e) => {
+                if (e.target.value === '') {
+                  setRadiusKm(null)
+                } else {
+                  const number = Number(e.target.value)
+                  setRadiusKm(number)
+                }
+              }}
               style={{ width: 80, marginLeft: 6 }}
             />
           </label>
@@ -69,11 +77,13 @@ export default function App() {
         </div>
 
         <div style={{ flex: 1, overflow: "hidden" }}>
-          {data.items.length === 0 && !loading ? (
-            <div style={{ padding: 12, opacity: 0.7 }}>No tenders match your filters.</div>
-          ) : (
-            <ListView items={data.items} selectedId={selectedId} onSelect={setSelectedId} />
-          )}
+          {
+            loading
+              ? 'Loading...'
+              : data.items.length === 0
+                ? <div style={{ padding: 12, opacity: 0.7 }}>No tenders match your filters.</div>
+                : <ListView items={data.items} selectedId={selectedId} onSelect={handleSelect} markerRefs={markerRefs} />
+          }
         </div>
       </div>
 
@@ -82,7 +92,8 @@ export default function App() {
           user={data.user}
           items={data.items}
           selectedId={selectedId}
-          onSelect={setSelectedId}
+          onSelect={handleSelect}
+          markerRefs={markerRefs}
         />
       </div>
     </div>
