@@ -1,16 +1,3 @@
-# Tender Finder — Client Side (React)
-
-This is the frontend for the Tender Finder case. It is built with **React (Vite)** and connects to the Node/Express API.
-
-## Features
-
-## Requirements
-
-## Setup
-```bash
-cd client
-npm install
-
 # TenderFinderApp
 
 TenderFinderApp is a full-stack web application for browsing and visualizing tender data. It features a React frontend and a Node.js/Express backend with a SQLite database. This README provides step-by-step instructions for running the app locally.
