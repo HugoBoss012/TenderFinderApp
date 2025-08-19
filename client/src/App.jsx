@@ -70,7 +70,6 @@ export default function App() {
               className="app-radius-input"
             />
           </label>
-          {q && <button className="app-clear-btn" onClick={() => setQ("")}>Clear</button>}
           <span className="app-results-count">
             {loading ? "Loading…" : `${data.count} results`}
           </span>

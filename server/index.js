@@ -10,7 +10,7 @@ const APP_ORIGIN = process.env.APP_ORIGIN || '*';
 app.use(cors({ origin: APP_ORIGIN, credentials: false }));
 app.use(express.json());
 
-// Haversine distance in km
+// Calculates the Haversine distance (in kilometers) between two latitude/longitude points.
 function haversine(lat1, lon1, lat2, lon2) {
   const toRad = (d) => (d * Math.PI) / 180;
   const R = 6371;
@@ -31,9 +31,8 @@ function parseDateISO(v) {
   return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0,10);
 }
 
-// Simple relevancy ranking (0..100)
-function ranking({ distanceKm, deadlineISO, nProps, expensive, mid, social }) {
-  // Simple ranking: closer, sooner, more properties
+// Calculates a relevancy ranking for a tender based on distance, deadline, and number of properties.
+function ranking({ distanceKm, deadlineISO, nProps }) {
   const prox = 1 - Math.min(1, (distanceKm || 50) / 50);
   const urg = deadlineISO ? Math.max(0, 1 - ((new Date(deadlineISO) - new Date()) / (1000*60*60*24*90))) : 0.5;
   const props = Math.min(1, (nProps || 0) / 100);
@@ -41,6 +40,8 @@ function ranking({ distanceKm, deadlineISO, nProps, expensive, mid, social }) {
   return Math.round(raw * 100);
 }
 
+// GET /api/tenders
+// Returns a list of tenders, enriched with distance, deadline, and relevancy, filtered and sorted by query parameters.
 app.get('/api/tenders', (req, res) => {
   const userLat = parseNum(req.query.lat, 52.370216);   // default Amsterdam
   const userLon = parseNum(req.query.lon, 4.895168);
@@ -86,6 +87,8 @@ app.get('/api/tenders', (req, res) => {
   res.json({ user: { lat: userLat, lon: userLon, radiusKm }, count: enriched.length, items: enriched });
 });
 
+// GET /api/tenders/:id
+// Returns a single tender by its ID, or 404 if not found.
 app.get('/api/tenders/:id', (req,res) => {
   const row = db.prepare('SELECT * FROM tenders WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'Not found' });
@@ -93,7 +96,8 @@ app.get('/api/tenders/:id', (req,res) => {
 });
 
 
-// Stats endpoint: returns summary statistics about tenders
+// GET /api/stats
+// Returns summary statistics about all tenders, including counts by status and municipality, and deadline range.
 app.get('/api/stats', (req, res) => {
   const rows = db.prepare('SELECT * FROM tenders').all();
   const total = rows.length;
@@ -123,4 +127,5 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
+// Starts the Express server and listens on the specified port.
 app.listen(PORT, () => console.log(`API on :${PORT}`));

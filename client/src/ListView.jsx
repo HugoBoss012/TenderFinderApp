@@ -21,7 +21,7 @@ export default function ListView({ items, selectedId, onSelect }) {
             <th>Deadline</th>
             <th>Published</th>
             <th>Status</th>
-            <th>#Props</th>
+            <th>Properties</th>
             <th>Distance (km)</th>
           </tr>
         </thead>
