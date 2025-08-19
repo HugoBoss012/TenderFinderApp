@@ -15,13 +15,12 @@ export default function ListView({ items, selectedId, onSelect }) {
       <table className="listview-table">
         <thead>
           <tr>
-            <th>Relevancy</th>
+
             <th>Location</th>
             <th>Municipality</th>
             <th>Deadline</th>
             <th>Published</th>
             <th>Status</th>
-            <th>Properties</th>
             <th>Distance (km)</th>
           </tr>
         </thead>
@@ -35,13 +34,11 @@ export default function ListView({ items, selectedId, onSelect }) {
               }}
               className={selectedId === item.id ? 'selected' : ''}
             >
-              <td>{item.relevancy}</td>
               <td>{item.location || '—'}</td>
               <td>{item.municipality || '—'}</td>
               <td>{item.deadline_iso || '—'}</td>
               <td>{item.publication_date || '—'}</td>
               <td>{item.status || '—'}</td>
-              <td>{item.number_of_properties ?? '—'}</td>
               <td>{item.distance_km ? item.distance_km.toFixed(1) : '—'}</td>
             </tr>
           ))}
